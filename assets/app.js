@@ -94,7 +94,7 @@
     return `<section class="vote-group" aria-label="${esc(position)}選舉結果"><h3>${esc(position)}</h3>${candidateNote}${pie}<div class="table-scroll"><table class="vote-table"><thead><tr><th scope="col">${heading}</th><th scope="col">${votesHeading}</th><th scope="col">得票比例</th></tr></thead><tbody>${rows}</tbody></table></div>${note?`<p class="meta">${note}</p>`:''}${stats?`<dl class="vote-stats">${stats}</dl>`:''}${first.date?`<p class="meta">發布日期：${date(first.date)}</p>`:''}</section>`;
   };
 
-  const electionHub = (archives,candidates,results) => {
+  const electionHub = (archives,activities,candidates,results) => {
     const terms = archives.filter(x=>x && txt(x.id));
     // 最新學年度優先；同學年度依自治屆次名稱排序。進行狀態不影響新舊順序。
     const sorted = [...terms].sort((a,b)=>
@@ -103,6 +103,7 @@
     if(!sorted.length) { app.innerHTML=empty('目前沒有可供查詢的選舉屆次。'); return; }
     const requestedTerm=txt(qs.get('term'));
     const initialTerm=sorted.some(x=>txt(x.id)===requestedTerm)?requestedTerm:txt(sorted[0].id);
+    const requestedActivity=txt(qs.get('activity'));
     const requestedTab=txt(qs.get('tab'));
     const initialTab=electionTabs.includes(requestedTab)?requestedTab:'candidates';
     const renderCandidate = x => `<article class="candidate-card">${candidatePhoto(x)}<div class="candidate-details"><h3>${esc(x.name)}</h3><p class="candidate-position">${esc(x.position||'未提供職務')}</p><p class="meta">資格審查：${esc(x.reviewStatus||'未提供')}</p><p>${x.platformUrl?anchor(x.platformUrl,'查看政見資料'):'<span class="subtle">尚無公開政見連結</span>'}</p></div></article>`;
@@ -111,17 +112,28 @@
       rows.forEach(r => { const key=txt(r.position)||'未指定職務'; if(!byPosition.has(key))byPosition.set(key,[]);byPosition.get(key).push(r); });
       return [...byPosition].map(([position,group]) => renderVoteGroup(position,group,candidates)).join('');
     };
-    app.innerHTML=`<section class="panel election-picker"><label for="election-term">選擇選舉屆次（共 ${sorted.length} 屆）</label><select id="election-term" aria-label="選擇選舉屆次">${sorted.map(x=>`<option value="${esc(x.id)}">${esc(x.term||x.name||'未命名屆次')}（${esc(x.year||'學年度未提供')}）</option>`).join('')}</select><div id="election-summary" class="election-summary" aria-live="polite"></div></section>
+    app.innerHTML=`<section class="panel election-picker"><label for="election-term">選擇選舉屆次（共 ${sorted.length} 屆）</label><select id="election-term" aria-label="選擇選舉屆次">${sorted.map(x=>`<option value="${esc(x.id)}">${esc(x.term||x.name||'未命名屆次')}（${esc(x.year||'學年度未提供')}）</option>`).join('')}</select><div id="election-summary" class="election-summary" aria-live="polite"></div><div class="election-activity-picker"><label for="election-activity">選擇選舉項目</label><select id="election-activity" aria-label="選擇選舉項目"></select><p id="election-activity-detail" class="meta" aria-live="polite"></p></div></section>
       <section class="election-section" aria-label="該屆選舉資料"><div class="election-tabs" role="tablist" aria-label="選舉資訊分頁">${electionTabs.map((t,i)=>`<button type="button" id="tab-${t}" class="election-tab" role="tab" aria-controls="election-content" aria-selected="false" tabindex="-1" data-election-tab="${t}">${electionTabLabels[t]}</button>`).join('')}</div><div class="panel election-content" id="election-content" role="tabpanel" tabindex="0" aria-labelledby="tab-candidates"><div class="toolbar"><input type="search" id="election-search" aria-label="搜尋本屆選舉資料" placeholder="搜尋候選人資訊"></div><div id="election-list" aria-live="polite"></div></div></section>`;
     const selector=$('election-term');
     selector.value=initialTerm;
     let activeTab=initialTab;
+    const activitySelector=$('election-activity');
+    const updateActivities = (preferred='') => {
+      const available=activities.filter(x=>x && txt(x.id) && txt(x.termId)===selector.value);
+      activitySelector.innerHTML=available.length?available.map(x=>`<option value="${esc(x.id)}">${esc(x.name||'未命名選舉項目')}</option>`).join(''):'<option value="">本屆尚無公開選舉項目</option>';
+      activitySelector.disabled=!available.length;
+      activitySelector.value=available.some(x=>txt(x.id)===preferred)?preferred:(available[0]?txt(available[0].id):'');
+    };
+    updateActivities(requestedActivity);
     const update = () => {
       const termId=selector.value;
       const term=sorted.find(x=>txt(x.id)===termId);
       $('election-summary').innerHTML=term?`<h2>${esc(term.term||term.name||'未命名屆次')}</h2><p class="meta">學年度：${esc(term.year||'未提供')}　${badge(term.status)}</p>`:'';
+      const activityId=activitySelector.value;
+      const activity=activities.find(x=>txt(x.id)===activityId && txt(x.termId)===termId);
+      $('election-activity-detail').textContent=activity?[txt(activity.start)&&txt(activity.end)?`${txt(activity.start)}－${txt(activity.end)}`:'',txt(activity.status)].filter(Boolean).join(' · '):'';
       const collections={candidates:candidates.filter(x=>x&&x.name),results:results.filter(x=>x)};
-      const collection=collections[activeTab].filter(x=>txt(x.termId)===termId);
+      const collection=collections[activeTab].filter(x=>txt(x.termId)===termId && !!activityId && txt(x.activityId)===activityId);
       const query=txt($('election-search').value).toLowerCase();
       const visible=collection.filter(x=>!query||Object.values(x).some(v=>typeof v==='string'&&v.toLowerCase().includes(query)));
       const renderer={candidates:renderCandidate}[activeTab];
@@ -134,10 +146,12 @@
       $('election-search').placeholder='搜尋'+electionTabLabels[activeTab];
       const url=new URL(location.href);
       url.searchParams.set('term',termId);
+      if(activityId)url.searchParams.set('activity',activityId);else url.searchParams.delete('activity');
       url.searchParams.set('tab',activeTab);
       history.replaceState(null,'',url.pathname+url.search+url.hash);
     };
-    selector.addEventListener('change',()=>{$('election-search').value='';update();});
+    selector.addEventListener('change',()=>{$('election-search').value='';updateActivities();update();});
+    activitySelector.addEventListener('change',()=>{$('election-search').value='';update();});
     $('election-search').addEventListener('input',update);
     electionTabs.forEach((t,i)=>{
       const button=$('tab-'+t);
@@ -157,14 +171,14 @@
     const attachments=list(data.attachments);
     const archives=list(data.archives);
     termNames=Object.fromEntries(archives.filter(x=>x?.id).map(x=>[txt(x.id),txt(x.term)||txt(x.name)]));
-    const candidates=list(data.candidates),results=list(data.results),regulations=list(data.regulations),documents=list(data.documents);
+    const activities=list(data.activities),candidates=list(data.candidates),results=list(data.results),regulations=list(data.regulations),documents=list(data.documents);
     const intros={home:'最新公告與選舉資訊一站查詢。',announcements:'查詢選舉委員會已發布的公告。',announcement:'正式公告內容及經審核公開的附件。',archives:'依選舉屆次瀏覽歷屆資料。',candidates:'候選人及參選職務等公開資訊。',results:'查詢已發布的選舉結果。',regulations:'公開的選舉法規及相關規範。',documents:'已公開的選舉文件與表單。',elections:'依選舉屆次查看候選人及選舉結果。'};
     $('page-intro').textContent=intros[page]||'';
     $('last-updated').textContent=data.updatedAt?'資料更新：'+txt(data.updatedAt).replace('T',' ').slice(0,16):'尚未匯入正式資料';
     if(page==='home'||page==='index') {
       const quick=[['announcements','公告中心','已發布公告及公開附件'],['elections','選舉專區','歷屆選舉、候選人及結果'],['regulations','法規專區','選舉相關規範'],['documents','文件下載','公開表單及文件']];
       app.innerHTML=`<section class="hero"><h2>公開、透明的選舉資訊</h2><p>公告、候選人與歷屆選舉資訊。</p><a href="announcements.html">查看最新公告</a></section>${panel('最新公告',announcements.length?announcements.slice(0,5).map(announcementItem).join(''): '<p class="empty">目前沒有已發布的公告。</p>')}<section class="grid" aria-label="快速導覽">${quick.map(([id,title,desc])=>`<a class="quick-link" href="${id}.html"><strong>${title}</strong><span>${desc}</span></a>`).join('')}</section>`;
-    } else if(page==='elections') electionHub(archives,candidates,results);
+    } else if(page==='elections') electionHub(archives,activities,candidates,results);
     else if(page==='announcements') filters(announcements,announcementItem,{category:true,term:true,placeholder:'搜尋公告標題、摘要或內文'});
     else if(page==='announcement') {
       const id=qs.get('id'); const a=announcements.find(x=>txt(x.id)===id);
