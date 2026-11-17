@@ -42,8 +42,9 @@
     try { const u=new URL(raw); return u.protocol==='https:' && !u.username && !u.password ? u.href : ''; } catch { return ''; }
   };
   const candidatePhoto = x => {
-    const url=safePhotoUrl(x.photoUrl);
-    return `<div class="candidate-photo">${url?`<img src="${esc(url)}" alt="${esc(x.name||'候選人')}的公開照片" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="photo-placeholder" hidden aria-hidden="true">👤</span>`:'<span class="photo-placeholder" aria-hidden="true">👤</span>'}</div>`;
+    const urls=[safePhotoUrl(x.photoUrl),safePhotoUrl(x.photoUrl2)].filter(Boolean);
+    const photos=urls.length?urls.map((url,i)=>`<div class="candidate-photo-item"><img src="${esc(url)}" alt="${esc(x.name||'候選人')}的公開照片${urls.length>1?' '+(i+1):''}" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="photo-placeholder" hidden aria-hidden="true">👤</span></div>`).join(''):'<div class="candidate-photo-item"><span class="photo-placeholder" aria-hidden="true">👤</span></div>';
+    return `<div class="candidate-photo${urls.length>1?' candidate-photo-double':''}">${photos}</div>`;
   };
   const voteNumber = value => {
     const raw=txt(value).replace(/,/g,'');
