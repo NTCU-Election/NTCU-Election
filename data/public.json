@@ -3,10 +3,102 @@
   "announcements": [],
   "attachments": [],
   "regulations": [],
-  "archives": [],
-  "updatedAt": "2026-11-16T17:48:00.387Z",
-  "activities": [],
-  "candidates": [],
-  "results": [],
+  "archives": [
+    {
+      "id": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "term": "第15屆",
+      "year": "108",
+      "status": "已結束"
+    },
+    {
+      "id": "9864f19b-fbf3-4ea8-8404-d2e41d95a0b6",
+      "term": "第16屆",
+      "year": "109",
+      "status": "已結束"
+    },
+    {
+      "id": "971b58c3-e627-47c4-abfc-962b1a47c00e",
+      "term": "第17屆",
+      "year": "110",
+      "status": "已結束"
+    },
+    {
+      "id": "b7ad824b-7fea-4f9f-ad88-ee363487b727",
+      "term": "第18屆",
+      "year": "111",
+      "status": "已結束"
+    },
+    {
+      "id": "e93f8011-15a4-408f-bffa-814dc86d376d",
+      "term": "第19屆",
+      "year": "112",
+      "status": "已結束"
+    },
+    {
+      "id": "1d31934f-4ba3-424c-8e5f-3e97e42be860",
+      "term": "第20屆",
+      "year": "113",
+      "status": "已結束"
+    },
+    {
+      "id": "c064f4a1-bf03-47d8-b6b7-693a99978d0b",
+      "term": "第21屆",
+      "year": "114",
+      "status": "已結束"
+    },
+    {
+      "id": "172c2566-dfbd-48a5-977d-e3d28899b4f0",
+      "term": "第22屆",
+      "year": "115",
+      "status": "進行中"
+    }
+  ],
+  "updatedAt": "2026-11-17T07:41:18.651Z",
+  "activities": [
+    {
+      "id": "c337e728-4b9c-4267-8452-639d21f779ff",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "name": "第15屆(108學年度)學生會正副會長選舉",
+      "description": "",
+      "status": "已結束",
+      "start": "2019-03-22",
+      "end": "2019-05-07"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "8bcf8380-dc53-4bf9-aa59-5679e1093905",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "name": "張銘展、陳昕",
+      "position": "會長、副會長",
+      "platformUrl": "https://drive.google.com/file/d/1EW9MUCNAzQojkqR0DcsX2v94utVkMGT9/view?usp=sharing",
+      "reviewStatus": "審查通過",
+      "photoUrl": "https://drive.google.com/file/d/1XSsILrX29FxMTdXBLF52dzFI96m2U1lj/view?usp=sharing",
+      "photoUrl2": "https://drive.google.com/file/d/1CueVCWKpcszlD-G0zBwRbMcbKbkPebG9/view?usp=drive_link",
+      "activityId": "c337e728-4b9c-4267-8452-639d21f779ff"
+    }
+  ],
+  "results": [
+    {
+      "id": "016f0077-3bb0-468e-89b1-953f348ad485",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "position": "會長、副會長",
+      "candidateId": "8bcf8380-dc53-4bf9-aa59-5679e1093905",
+      "candidateName": "張銘展、陳昕",
+      "countingUnitId": "",
+      "maxSelections": "",
+      "voteMethod": "正反決投票",
+      "approvalVotes": "295",
+      "oppositionVotes": "19",
+      "votes": "",
+      "validVotes": "314",
+      "invalidVotes": "9",
+      "totalVotes": "323",
+      "turnout": "9.9%",
+      "status": "已發布",
+      "date": "2026-11-17T05:40:46.489Z",
+      "activityId": "c337e728-4b9c-4267-8452-639d21f779ff"
+    }
+  ],
   "documents": []
 }
