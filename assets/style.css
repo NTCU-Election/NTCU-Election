@@ -30,3 +30,27 @@
 @media(max-width:620px){.brand-emblem{width:44px;height:44px}.brand{min-width:0}}
 
 .footer-contact{max-width:440px}.footer-contact a{overflow-wrap:anywhere}.footer-contact a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* ECS v1.0.2: compact square candidate portraits (96px each). */
+.candidate-card .candidate-photo{
+  width:96px;
+  height:96px;
+  aspect-ratio:1/1;
+  margin:12px auto 0;
+  background:transparent;
+}
+.candidate-card .candidate-photo.candidate-photo-double{
+  width:200px;
+  height:96px;
+  grid-template-columns:repeat(2,96px);
+  gap:8px;
+}
+.candidate-card .candidate-photo img{object-fit:contain}
+.legacy-candidate .candidate-photo{width:96px;flex:0 0 96px;height:96px;aspect-ratio:1/1}
+.legacy-candidate .candidate-photo.candidate-photo-double{width:200px;flex:0 0 200px}
+@media(max-width:620px){
+  .candidate-card .candidate-photo{width:76px;height:76px}
+  .candidate-card .candidate-photo.candidate-photo-double{width:160px;height:76px;grid-template-columns:repeat(2,76px);gap:8px}
+  .legacy-candidate .candidate-photo{width:76px;flex-basis:76px;height:76px}
+  .legacy-candidate .candidate-photo.candidate-photo-double{width:160px;flex-basis:160px}
+}
