@@ -53,7 +53,7 @@
       "status": "進行中"
     }
   ],
-  "updatedAt": "2026-11-17T07:52:07.799Z",
+  "updatedAt": "2026-11-17T09:21:24.724Z",
   "activities": [
     {
       "id": "c337e728-4b9c-4267-8452-639d21f779ff",
@@ -63,6 +63,15 @@
       "status": "已結束",
       "start": "2019-03-22",
       "end": "2019-05-07"
+    },
+    {
+      "id": "1b0754ed-e392-42f4-8d0f-c359ffe3fe99",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "name": "第15屆(108學年度)學生議會議員補行選舉",
+      "description": "",
+      "status": "已結束",
+      "start": "2020-02-01",
+      "end": "2020-03-19"
     }
   ],
   "candidates": [
@@ -76,6 +85,39 @@
       "photoUrl": "https://drive.google.com/thumbnail?id=1XSsILrX29FxMTdXBLF52dzFI96m2U1lj&sz=w1000",
       "photoUrl2": "https://drive.google.com/thumbnail?id=1CueVCWKpcszlD-G0zBwRbMcbKbkPebG9&sz=w1000",
       "activityId": "c337e728-4b9c-4267-8452-639d21f779ff"
+    },
+    {
+      "id": "20c0642f-59ba-4c17-a839-cf31c7f30a7b",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "name": "鄒新猷",
+      "position": "學生議會議員/教育學院選區",
+      "platformUrl": "",
+      "reviewStatus": "審查通過",
+      "photoUrl": "",
+      "photoUrl2": "",
+      "activityId": "1b0754ed-e392-42f4-8d0f-c359ffe3fe99"
+    },
+    {
+      "id": "c44a2ee4-6165-4967-908a-81fff4b4ee5a",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "name": "王毓晴",
+      "position": "學生議會議員/教育學院選區",
+      "platformUrl": "",
+      "reviewStatus": "審查通過",
+      "photoUrl": "",
+      "photoUrl2": "",
+      "activityId": "1b0754ed-e392-42f4-8d0f-c359ffe3fe99"
+    },
+    {
+      "id": "b1a80665-780d-4627-80a9-324f90e25c0d",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "name": "王宜揚",
+      "position": "學生議會議員/教育學院選區",
+      "platformUrl": "",
+      "reviewStatus": "審查通過",
+      "photoUrl": "",
+      "photoUrl2": "",
+      "activityId": "1b0754ed-e392-42f4-8d0f-c359ffe3fe99"
     }
   ],
   "results": [
@@ -98,6 +140,66 @@
       "status": "已發布",
       "date": "2026-11-17T05:40:46.489Z",
       "activityId": "c337e728-4b9c-4267-8452-639d21f779ff"
+    },
+    {
+      "id": "e610c51f-7929-44d2-beb1-437be9e71c6c",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "position": "學生議會議員/教育學院選區",
+      "candidateId": "20c0642f-59ba-4c17-a839-cf31c7f30a7b",
+      "candidateName": "鄒新猷",
+      "countingUnitId": "c56d3624-3dc3-4a5c-a062-baccb298797f",
+      "maxSelections": "1",
+      "voteMethod": "足額選舉投票",
+      "approvalVotes": "",
+      "oppositionVotes": "",
+      "votes": "18",
+      "validVotes": "40",
+      "invalidVotes": "4",
+      "totalVotes": "44",
+      "turnout": "5.72%",
+      "status": "已發布",
+      "date": "2026-11-17T08:55:09.409Z",
+      "activityId": "1b0754ed-e392-42f4-8d0f-c359ffe3fe99"
+    },
+    {
+      "id": "3cd914ea-93a7-48fe-9fcc-bb85156936d4",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "position": "學生議會議員/教育學院選區",
+      "candidateId": "c44a2ee4-6165-4967-908a-81fff4b4ee5a",
+      "candidateName": "王毓晴",
+      "countingUnitId": "c56d3624-3dc3-4a5c-a062-baccb298797f",
+      "maxSelections": "1",
+      "voteMethod": "足額選舉投票",
+      "approvalVotes": "",
+      "oppositionVotes": "",
+      "votes": "14",
+      "validVotes": "40",
+      "invalidVotes": "4",
+      "totalVotes": "44",
+      "turnout": "5.72%",
+      "status": "已發布",
+      "date": "2026-11-17T08:55:47.311Z",
+      "activityId": "1b0754ed-e392-42f4-8d0f-c359ffe3fe99"
+    },
+    {
+      "id": "fd3339fb-482f-49c9-bb8a-50b11c6b3301",
+      "termId": "5145d6e1-edd2-49f9-aca9-482f0e3d01f3",
+      "position": "學生議會議員/教育學院選區",
+      "candidateId": "b1a80665-780d-4627-80a9-324f90e25c0d",
+      "candidateName": "王宜揚",
+      "countingUnitId": "c56d3624-3dc3-4a5c-a062-baccb298797f",
+      "maxSelections": "1",
+      "voteMethod": "足額選舉投票",
+      "approvalVotes": "",
+      "oppositionVotes": "",
+      "votes": "8",
+      "validVotes": "40",
+      "invalidVotes": "4",
+      "totalVotes": "44",
+      "turnout": "5.72%",
+      "status": "已發布",
+      "date": "2026-11-17T08:56:16.324Z",
+      "activityId": "1b0754ed-e392-42f4-8d0f-c359ffe3fe99"
     }
   ],
   "documents": []
