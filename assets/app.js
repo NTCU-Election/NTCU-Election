@@ -186,6 +186,10 @@
     const archives=list(data.archives);
     termNames=Object.fromEntries(archives.filter(x=>x?.id).map(x=>[txt(x.id),txt(x.term)||txt(x.name)]));
     const activities=list(data.activities),candidates=list(data.candidates),results=list(data.results),regulations=list(data.regulations),documents=list(data.documents);
+    const lawCategories=list(data.lawCategories);
+    const lawOrder=new Map(lawCategories.filter(c=>txt(c.name)).map(c=>[txt(c.name),Number(c.sort)]));
+    const lawRank=name=>lawOrder.has(txt(name)) && Number.isFinite(lawOrder.get(txt(name))) ? lawOrder.get(txt(name)) : Number.POSITIVE_INFINITY;
+    const orderedRegulations=[...regulations].sort((a,b)=>lawRank(a.category)-lawRank(b.category));
     const intros={home:'最新公告與選舉資訊一站查詢。',announcements:'查詢選舉委員會已發布的公告。',announcement:'正式公告內容及經審核公開的附件。',archives:'依選舉屆次瀏覽歷屆資料。',candidates:'候選人及參選職務等公開資訊。',results:'查詢已發布的選舉結果。',regulations:'公開的選舉法規及相關規範。',documents:'已公開的選舉文件與表單。',elections:'依選舉屆次查看候選人及選舉結果。'};
     $('page-intro').textContent=intros[page]||'';
     $('last-updated').textContent=data.updatedAt?'資料更新：'+txt(data.updatedAt).replace('T',' ').slice(0,16):'尚未匯入正式資料';
@@ -203,7 +207,20 @@
     } else if(page==='archives') filters(archives.map(x=>({...x,category:x.status,termId:x.id})),x=>`<article class="entry"><h2>${esc(x.term||x.name||'未命名屆次')}</h2><p class="meta">學年度：${esc(x.year||'未提供')} · 狀態：${esc(x.status||'未提供')}</p><p>${link('elections.html?term='+encodeURIComponent(txt(x.id))+'&tab=candidates','查看該屆候選人')}　${link('elections.html?term='+encodeURIComponent(txt(x.id))+'&tab=candidates','候選人')}　${link('elections.html?term='+encodeURIComponent(txt(x.id))+'&tab=results','選舉結果')}</p></article>`,{placeholder:'搜尋屆次或學年度'});
     else if(page==='candidates') filters(candidates.filter(x=>x&&x.name),x=>`<article class="entry legacy-candidate">${candidatePhoto(x)}<div><h3>${esc(x.name)}</h3><p class="meta">${groupTerm(x.termId)} · ${esc(x.position||'未提供職務')}</p><p>資格審查：${esc(x.reviewStatus||'未提供')}　${x.platformUrl?anchor(x.platformUrl,'政見資料'):''}</p></div></article>`,{term:true,placeholder:'搜尋候選人或參選職務'});
     else if(page==='results') filters(results,x=>`<article class="entry"><h3>${esc(x.position||'選舉結果')}</h3><p class="meta">${groupTerm(x.termId)} · ${date(x.date)} · ${esc(x.status||'')}</p><p>候選人：${esc(x.candidateName||x.candidateId||'未提供')}　${txt(x.voteMethod)==='正反決投票'?`贊成票：${esc(x.approvalVotes??'未提供')}　反對票：${esc(x.oppositionVotes??'未提供')}`:`得票數：${esc(x.votes??'未提供')}`}　投票率：${esc(x.turnout||'未提供')}　當選(通過)：${esc(x.elected||'未設定')}</p></article>`,{term:true,placeholder:'搜尋選舉結果'});
-    else if(page==='regulations') filters(regulations,x=>`<article class="entry">${badge(x.category)}<h3>${esc(x.title||'未命名法規')}</h3><p class="meta">版本：${esc(x.version||'未提供')}</p>${anchor(x.url,'檢視法規文件')}</article>`,{category:true,placeholder:'搜尋法規名稱'});
+    else if(page==='regulations') {
+      const renderLaw=x=>`<article class="entry">${badge(x.category)}<h3>${esc(x.title||'未命名法規')}</h3><p class="meta">版本：${esc(x.version||'未提供')}</p>${anchor(x.url,'檢視法規文件')}</article>`;
+      const cats=[...new Set(orderedRegulations.map(x=>txt(x.category)).filter(Boolean))]
+        .sort((a,b)=>lawRank(a)-lawRank(b)||a.localeCompare(b,'zh-Hant',{numeric:true}));
+      app.innerHTML=`<div class="toolbar"><input id="search" type="search" aria-label="搜尋法規" placeholder="搜尋法規名稱"><select id="category" aria-label="法規分類"><option value="">全部分類</option>${cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select></div><div id="filtered" aria-live="polite"></div>`;
+      const updateLaw=()=>{
+        const q=txt($('search').value).toLowerCase(),c=$('category').value;
+        const rows=orderedRegulations.filter(x=>(!c||txt(x.category)===c)&&(!q||Object.values(x).some(v=>typeof v==='string'&&v.toLowerCase().includes(q))));
+        $('filtered').innerHTML=rows.length?`<div class="panel">${rows.map(renderLaw).join('')}</div>`:empty('沒有符合條件的公開資料。');
+      };
+      $('search').addEventListener('input',updateLaw);
+      $('category').addEventListener('change',updateLaw);
+      updateLaw();
+    }
     else if(page==='documents') filters(documents,x=>`<article class="entry">${badge(x.category)}<h3>${esc(x.title||'未命名文件')}</h3><p class="meta">${groupTerm(x.termId)}</p>${anchor(x.url,'開啟文件')}</article>`,{category:true,term:true,placeholder:'搜尋文件名稱'});
     // Allow pre-selected term when navigating from archive.
     if(qs.get('term')&&$('term')){$('term').value=qs.get('term');$('term').dispatchEvent(new Event('change'));}
