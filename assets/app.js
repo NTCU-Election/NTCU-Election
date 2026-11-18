@@ -206,7 +206,7 @@
       app.innerHTML=content+panel('公開附件',files.length?`<ul class="attachment-list">${files.map(f=>`<li>📎 ${anchor(f.url,f.name||'附件')} <span class="meta">${esc(f.mime||'')}</span></li>`).join('')}</ul>`:'<p class="empty">本公告沒有已公開的附件。</p>');
     } else if(page==='regulation') {
       const id=qs.get('id');
-      const law=regulations.find(x=>txt(x.id)===id);
+      const law=id?regulations.find(x=>txt(x.id)===id):null;
       if(!law){app.innerHTML=empty('找不到這項公開法規，可能已下架或連結有誤。');return;}
       const content=`<a class="back-link" href="regulations.html">← 返回法規專區</a><article class="panel">${badge(law.category)}<h2>${esc(law.title||'未命名法規')}</h2><p class="meta">版本：${esc(law.version||'未提供')}</p><div class="article-body" style="white-space:pre-wrap">${esc(law.content||'（尚無法規內文）')}</div>${txt(law.url)?`<p>${anchor(law.url,'檢視法規文件')}</p>`:''}</article>`;
       app.innerHTML=content;
