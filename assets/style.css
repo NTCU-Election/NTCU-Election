@@ -59,3 +59,7 @@
   .legacy-candidate .candidate-photo{width:76px;flex-basis:76px;height:76px}
   .legacy-candidate .candidate-photo.candidate-photo-double{width:160px;flex-basis:160px}
 }
+
+/* Third-level election position filter */
+.election-position-picker{margin-top:16px;padding-top:16px;border-top:1px solid #e3d7ca}
+.election-position-picker select:disabled{opacity:.65}

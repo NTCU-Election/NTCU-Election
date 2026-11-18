@@ -105,6 +105,7 @@
     const initialTerm=sorted.some(x=>txt(x.id)===requestedTerm)?requestedTerm:txt(sorted[0].id);
     const requestedActivity=txt(qs.get('activity'));
     const requestedTab=txt(qs.get('tab'));
+    const requestedPosition=txt(qs.get('position'));
     const initialTab=electionTabs.includes(requestedTab)?requestedTab:'candidates';
     const renderCandidate = x => `<article class="candidate-card">${candidatePhoto(x)}<div class="candidate-details"><h3>${esc(x.name)}</h3><p class="candidate-position">${esc(x.position||'未提供職務')}</p><p class="meta">資格審查：${esc(x.reviewStatus||'未提供')}</p><p>${x.platformUrl?anchor(x.platformUrl,'查看政見資料'):'<span class="subtle">尚無公開政見連結</span>'}</p></div></article>`;
     const renderResults = rows => {
@@ -112,12 +113,13 @@
       rows.forEach(r => { const key=txt(r.position)||'未指定職務'; if(!byPosition.has(key))byPosition.set(key,[]);byPosition.get(key).push(r); });
       return [...byPosition].map(([position,group]) => renderVoteGroup(position,group,candidates)).join('');
     };
-    app.innerHTML=`<section class="panel election-picker"><label for="election-term">選擇選舉屆次（共 ${sorted.length} 屆）</label><select id="election-term" aria-label="選擇選舉屆次">${sorted.map(x=>`<option value="${esc(x.id)}">${esc(x.term||x.name||'未命名屆次')}（${esc(x.year||'學年度未提供')}）</option>`).join('')}</select><div id="election-summary" class="election-summary" aria-live="polite"></div><div class="election-activity-picker"><label for="election-activity">選擇選舉項目</label><select id="election-activity" aria-label="選擇選舉項目"></select><p id="election-activity-detail" class="meta" aria-live="polite"></p></div></section>
+    app.innerHTML=`<section class="panel election-picker"><label for="election-term">選擇選舉屆次（共 ${sorted.length} 屆）</label><select id="election-term" aria-label="選擇選舉屆次">${sorted.map(x=>`<option value="${esc(x.id)}">${esc(x.term||x.name||'未命名屆次')}（${esc(x.year||'學年度未提供')}）</option>`).join('')}</select><div id="election-summary" class="election-summary" aria-live="polite"></div><div class="election-activity-picker"><label for="election-activity">選擇選舉項目</label><select id="election-activity" aria-label="選擇選舉項目"></select><p id="election-activity-detail" class="meta" aria-live="polite"></p></div><div class="election-position-picker"><label for="election-position">選擇參選職務</label><select id="election-position" aria-label="選擇參選職務"></select></div></section>
       <section class="election-section" aria-label="該屆選舉資料"><div class="election-tabs" role="tablist" aria-label="選舉資訊分頁">${electionTabs.map((t,i)=>`<button type="button" id="tab-${t}" class="election-tab" role="tab" aria-controls="election-content" aria-selected="false" tabindex="-1" data-election-tab="${t}">${electionTabLabels[t]}</button>`).join('')}</div><div class="panel election-content" id="election-content" role="tabpanel" tabindex="0" aria-labelledby="tab-candidates"><div class="toolbar"><input type="search" id="election-search" aria-label="搜尋本屆選舉資料" placeholder="搜尋候選人資訊"></div><div id="election-list" aria-live="polite"></div></div></section>`;
     const selector=$('election-term');
     selector.value=initialTerm;
     let activeTab=initialTab;
     const activitySelector=$('election-activity');
+    const positionSelector=$('election-position');
     const updateActivities = (preferred='') => {
       const available=activities.filter(x=>x && txt(x.id) && txt(x.termId)===selector.value);
       activitySelector.innerHTML=available.length?available.map(x=>`<option value="${esc(x.id)}">${esc(x.name||'未命名選舉項目')}</option>`).join(''):'<option value="">本屆尚無公開選舉項目</option>';
@@ -125,6 +127,16 @@
       activitySelector.value=available.some(x=>txt(x.id)===preferred)?preferred:(available[0]?txt(available[0].id):'');
     };
     updateActivities(requestedActivity);
+    const updatePositions = (preferred='') => {
+      const termId=selector.value,activityId=activitySelector.value;
+      const values=[...new Set([...candidates,...results]
+        .filter(x=>x && txt(x.termId)===termId && !!activityId && txt(x.activityId)===activityId)
+        .map(x=>txt(x.position)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-Hant',{numeric:true}));
+      positionSelector.innerHTML='<option value="">全部職務</option>'+values.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+      positionSelector.value=values.includes(preferred)?preferred:'';
+      positionSelector.disabled=!values.length;
+    };
+    updatePositions(requestedPosition);
     const update = () => {
       const termId=selector.value;
       const term=sorted.find(x=>txt(x.id)===termId);
@@ -133,7 +145,7 @@
       const activity=activities.find(x=>txt(x.id)===activityId && txt(x.termId)===termId);
       $('election-activity-detail').textContent=activity?[txt(activity.start)&&txt(activity.end)?`${txt(activity.start)}－${txt(activity.end)}`:'',txt(activity.status)].filter(Boolean).join(' · '):'';
       const collections={candidates:candidates.filter(x=>x&&x.name),results:results.filter(x=>x)};
-      const collection=collections[activeTab].filter(x=>txt(x.termId)===termId && !!activityId && txt(x.activityId)===activityId);
+      const collection=collections[activeTab].filter(x=>txt(x.termId)===termId && !!activityId && txt(x.activityId)===activityId && (!positionSelector.value || txt(x.position)===positionSelector.value));
       const query=txt($('election-search').value).toLowerCase();
       const visible=collection.filter(x=>!query||Object.values(x).some(v=>typeof v==='string'&&v.toLowerCase().includes(query)));
       const renderer={candidates:renderCandidate}[activeTab];
@@ -147,11 +159,13 @@
       const url=new URL(location.href);
       url.searchParams.set('term',termId);
       if(activityId)url.searchParams.set('activity',activityId);else url.searchParams.delete('activity');
+      if(positionSelector.value)url.searchParams.set('position',positionSelector.value);else url.searchParams.delete('position');
       url.searchParams.set('tab',activeTab);
       history.replaceState(null,'',url.pathname+url.search+url.hash);
     };
-    selector.addEventListener('change',()=>{$('election-search').value='';updateActivities();update();});
-    activitySelector.addEventListener('change',()=>{$('election-search').value='';update();});
+    selector.addEventListener('change',()=>{$('election-search').value='';updateActivities();updatePositions();update();});
+    activitySelector.addEventListener('change',()=>{$('election-search').value='';updatePositions();update();});
+    positionSelector.addEventListener('change',()=>{$('election-search').value='';update();});
     $('election-search').addEventListener('input',update);
     electionTabs.forEach((t,i)=>{
       const button=$('tab-'+t);
