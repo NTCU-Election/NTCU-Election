@@ -59,6 +59,14 @@
     return `M ${cx} ${cy} L ${x1.toFixed(3)} ${y1.toFixed(3)} A ${r} ${r} 0 ${end-start>Math.PI?1:0} 1 ${x2.toFixed(3)} ${y2.toFixed(3)} Z`;
   };
   const renderVoteGroup = (position,group,candidates) => {
+    // Each referendum result belongs to one candidate; never collapse multiple
+    // candidates into the first row's approval/opposition totals.
+    if(group.length>1 && group.some(r=>txt(r.voteMethod)==='正反決投票')) {
+      const ordinary=group.filter(r=>txt(r.voteMethod)!=='正反決投票');
+      const referendums=group.filter(r=>txt(r.voteMethod)==='正反決投票');
+      return (ordinary.length?renderVoteGroup(position,ordinary,candidates):'')+
+        referendums.map(r=>renderVoteGroup(position,[r],candidates)).join('');
+    }
     const first=group[0]||{};
     const referendum=group.every(r=>txt(r.voteMethod)==='正反決投票');
     const names=Object.fromEntries(candidates.filter(c=>c&&c.id).map(c=>[txt(c.id),txt(c.name)]));
